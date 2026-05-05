@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to PDF - Full Size, No Cutting</title>
+    <title>Image to PDF Converter - With Compression & Watermark</title>
     <style>
         * {
             margin: 0;
@@ -85,6 +85,50 @@
         .mode-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+        }
+
+        .settings-panel {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .setting-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .setting-item input, .setting-item select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .watermark-preview {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .quality-value {
+            display: inline-block;
+            margin-left: 10px;
+            color: #667eea;
+            font-weight: bold;
         }
 
         .preview-grid {
@@ -237,25 +281,71 @@
             font-size: 12px;
             font-weight: bold;
         }
+
+        .size-comparison {
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .preview-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            
+            .preview-img {
+                height: 100px;
+            }
+            
+            .settings-panel {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🖼️ Image to PDF Converter</h1>
-        <div class="subtitle">✅ 100% FULL SIZE - NO CUTTING - EXACT IMAGE DIMENSIONS</div>
+        <div class="subtitle">✅ Compression + Watermark | Smaller PDF Files</div>
         
         <div class="upload-area" id="uploadArea">
             <p>📁 Click or Drag & Drop Images Here</p>
-            <small>Your images will be saved at FULL SIZE - Nothing will be cut!</small>
+            <small>Compressed PDF = Smaller file size | Watermark included</small>
         </div>
         
         <input type="file" id="fileInput" multiple accept="image/*">
         
         <div class="mode-selector">
             <strong>📄 PDF Page Size:</strong><br><br>
-            <button class="mode-btn active" data-mode="image">🎯 MATCH IMAGE SIZE (No cutting)</button>
+            <button class="mode-btn active" data-mode="image">🎯 MATCH IMAGE SIZE</button>
             <button class="mode-btn" data-mode="a4">📄 A4 Paper</button>
             <button class="mode-btn" data-mode="letter">📄 Letter Paper</button>
+        </div>
+
+        <div class="settings-panel">
+            <div class="setting-item">
+                <label>📦 Compression Quality:</label>
+                <input type="range" id="compression" min="0.3" max="1" step="0.01" value="0.7">
+                <span class="quality-value" id="qualityValue">70%</span>
+                <div class="size-comparison">Lower = Smaller file | Higher = Better quality</div>
+            </div>
+            
+            <div class="setting-item">
+                <label>💧 Watermark Settings:</label>
+                <select id="watermarkPosition">
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                    <option value="center">Center</option>
+                </select>
+                <div class="watermark-preview">🔖 Watermark: <strong>ourbook 911573334</strong></div>
+            </div>
         </div>
         
         <div class="preview-grid" id="preview"></div>
@@ -276,7 +366,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         let selectedFiles = [];
-        let currentMode = 'image'; // image, a4, letter
+        let currentMode = 'image';
         
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -287,6 +377,15 @@
         const fileInfo = document.getElementById('fileInfo');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
+        const compressionSlider = document.getElementById('compression');
+        const qualityValue = document.getElementById('qualityValue');
+        const watermarkPosition = document.getElementById('watermarkPosition');
+        
+        // Compression quality display
+        compressionSlider.addEventListener('input', () => {
+            const value = Math.round(compressionSlider.value * 100);
+            qualityValue.textContent = `${value}%`;
+        });
         
         // Mode selection
         document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -373,7 +472,8 @@
                 
                 const info = document.createElement('div');
                 info.className = 'preview-info';
-                info.textContent = `${file.name.substring(0, 20)}${file.name.length > 20 ? '...' : ''}`;
+                const sizeKB = (file.size / 1024).toFixed(1);
+                info.textContent = `${file.name.substring(0, 15)}${file.name.length > 15 ? '...' : ''} (${sizeKB}KB)`;
                 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'remove-btn';
@@ -395,7 +495,7 @@
             
             const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
             const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 Total: ${sizeMB} MB | Mode: ${currentMode.toUpperCase()}`;
+            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 Original: ${sizeMB} MB | Mode: ${currentMode.toUpperCase()}`;
         }
         
         function showStatus(message, type) {
@@ -419,10 +519,30 @@
             }
         }
         
-        function fileToBase64(file) {
+        function fileToBase64(file, quality) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
+                reader.onload = (e) => {
+                    if (file.type === 'image/jpeg' && quality < 1) {
+                        // Compress JPEG images
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            canvas.toBlob((blob) => {
+                                const compressedReader = new FileReader();
+                                compressedReader.onloadend = () => resolve(compressedReader.result);
+                                compressedReader.readAsDataURL(blob);
+                            }, 'image/jpeg', quality);
+                        };
+                        img.src = e.target.result;
+                    } else {
+                        resolve(e.target.result);
+                    }
+                };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
@@ -437,6 +557,45 @@
             });
         }
         
+        function addWatermark(pdf, pageWidth, pageHeight, position) {
+            const watermarkText = 'ourbook 911573334';
+            const fontSize = pageWidth / 15; // Responsive font size
+            pdf.setFontSize(fontSize);
+            pdf.setTextColor(150, 150, 150); // Light gray
+            pdf.setGState(new pdf.GState({ opacity: 0.3 })); // 30% transparent
+            
+            let x, y;
+            const textWidth = pdf.getTextWidth(watermarkText);
+            
+            switch(position) {
+                case 'bottom-right':
+                    x = pageWidth - textWidth - 10;
+                    y = pageHeight - 15;
+                    break;
+                case 'bottom-left':
+                    x = 10;
+                    y = pageHeight - 15;
+                    break;
+                case 'top-right':
+                    x = pageWidth - textWidth - 10;
+                    y = 20;
+                    break;
+                case 'top-left':
+                    x = 10;
+                    y = 20;
+                    break;
+                case 'center':
+                    x = (pageWidth - textWidth) / 2;
+                    y = pageHeight / 2;
+                    break;
+                default:
+                    x = pageWidth - textWidth - 10;
+                    y = pageHeight - 15;
+            }
+            
+            pdf.text(watermarkText, x, y);
+        }
+        
         async function convertToPDF() {
             if (selectedFiles.length === 0) {
                 showStatus('❌ Please select images first', 'error');
@@ -444,27 +603,36 @@
             }
             
             convertBtn.disabled = true;
-            showStatus('🔄 Converting to PDF at FULL IMAGE SIZE...', 'info');
+            showStatus('🔄 Converting with compression and watermark...', 'info');
             
             try {
                 const { jsPDF } = jspdf;
                 let pdf = null;
                 let isFirstPage = true;
+                const compressionQuality = parseFloat(compressionSlider.value);
+                const watermarkPos = watermarkPosition.value;
+                
+                let originalSize = 0;
+                let compressedSize = 0;
                 
                 for (let i = 0; i < selectedFiles.length; i++) {
                     const file = selectedFiles[i];
+                    originalSize += file.size;
+                    
                     const progressPercent = Math.round((i / selectedFiles.length) * 100);
                     updateProgress(progressPercent, `Processing ${i+1}/${selectedFiles.length}`);
                     
-                    const base64 = await fileToBase64(file);
+                    // Compress if quality is less than 100%
+                    const base64 = await fileToBase64(file, compressionQuality);
                     const img = await loadImage(base64);
                     
-                    // Calculate dimensions based on mode
+                    // Calculate compressed size
+                    const base64Size = Math.round((base64.length * 3) / 4);
+                    compressedSize += base64Size;
+                    
                     let pdfWidth, pdfHeight, imgWidth, imgHeight, x, y;
                     
                     if (currentMode === 'image') {
-                        // CRITICAL: Make PDF page EXACTLY the image size in points (1/72 inch)
-                        // Convert pixels to points (1 point = 1/72 inch, assuming 96 DPI screen)
                         const pxToPoints = 72 / 96;
                         pdfWidth = img.width * pxToPoints;
                         pdfHeight = img.height * pxToPoints;
@@ -473,7 +641,6 @@
                         x = 0;
                         y = 0;
                         
-                        // Create custom size PDF
                         if (isFirstPage) {
                             pdf = new jsPDF({
                                 unit: 'pt',
@@ -486,7 +653,6 @@
                         }
                         
                     } else if (currentMode === 'a4') {
-                        // A4 in points (595 x 842)
                         pdfWidth = 595;
                         pdfHeight = 842;
                         const imgAspect = img.width / img.height;
@@ -516,7 +682,6 @@
                         }
                         
                     } else if (currentMode === 'letter') {
-                        // Letter in points (612 x 792)
                         pdfWidth = 612;
                         pdfHeight = 792;
                         const imgAspect = img.width / img.height;
@@ -546,18 +711,24 @@
                         }
                     }
                     
-                    // Add the image (use PNG format for better quality)
                     const format = file.type === 'image/png' ? 'PNG' : 'JPEG';
                     pdf.addImage(base64, format, x, y, imgWidth, imgHeight, undefined, 'FAST');
+                    
+                    // Add watermark
+                    addWatermark(pdf, pdfWidth, pdfHeight, watermarkPos);
                 }
                 
                 updateProgress(100, 'Complete!');
                 
                 const timestamp = new Date().getTime();
-                const filename = `fullsize-image-to-pdf-${timestamp}.pdf`;
+                const filename = `ourbook-pdf-${timestamp}.pdf`;
                 pdf.save(filename);
                 
-                showStatus(`✅ SUCCESS! PDF saved at FULL IMAGE SIZE. Downloaded: ${filename}`, 'success');
+                const originalMB = (originalSize / (1024 * 1024)).toFixed(2);
+                const compressedMB = (compressedSize / (1024 * 1024)).toFixed(2);
+                const savedPercent = ((1 - compressedSize/originalSize) * 100).toFixed(0);
+                
+                showStatus(`✅ Success! ${selectedFiles.length} images → PDF | Original: ${originalMB}MB | Compressed: ${compressedMB}MB | Saved: ${savedPercent}% | Watermark: ourbook 911573334`, 'success');
                 
             } catch (error) {
                 console.error('Error:', error);

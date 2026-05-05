@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professional Image to PDF Converter - High Quality</title>
+    <title>Professional Image to PDF Converter - Red Watermark</title>
     <style>
         * {
             margin: 0;
@@ -35,7 +35,7 @@
 
         .subtitle {
             text-align: center;
-            color: #28a745;
+            color: #dc3545;
             margin-bottom: 30px;
             font-weight: bold;
         }
@@ -64,7 +64,6 @@
             display: none;
         }
 
-        /* Advanced Controls */
         .advanced-panel {
             margin: 20px 0;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -112,26 +111,17 @@
             color: #666;
         }
 
-        .quality-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
+        .watermark-preview {
+            margin-top: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
             font-size: 11px;
-            font-weight: bold;
-            margin-left: 10px;
+            text-align: center;
+            color: #dc3545;
+            font-family: monospace;
         }
 
-        .quality-excellent {
-            background: #28a745;
-            color: white;
-        }
-
-        .quality-good {
-            background: #ffc107;
-            color: #333;
-        }
-
-        /* Preview Area */
         .preview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -305,16 +295,15 @@
 <body>
     <div class="container">
         <h1>🖼️ Professional Image to PDF Converter</h1>
-        <div class="subtitle">⚡ Maximum Quality | Advanced Controls | Professional Output</div>
+        <div class="subtitle">🔴 Small Red Watermark | Maximum Quality</div>
         
         <div class="upload-area" id="uploadArea">
             <p>📁 Click or Drag & Drop Images Here</p>
-            <small>Professional quality • High resolution • Advanced settings</small>
+            <small>Professional quality • Small red watermark • High resolution</small>
         </div>
         
         <input type="file" id="fileInput" multiple accept="image/*">
         
-        <!-- Advanced Settings Panel -->
         <div class="advanced-panel">
             <div class="panel-title">⚙️ ADVANCED QUALITY CONTROLS</div>
             <div class="controls-grid">
@@ -337,7 +326,6 @@
                         <option value="professional">Professional (90% - Recommended)</option>
                         <option value="standard">Standard (80% - Good)</option>
                     </select>
-                    <div class="value-display">💡 Maximum quality for printing/archiving</div>
                 </div>
                 
                 <div class="control-group">
@@ -348,13 +336,14 @@
                         <option value="150">150 DPI (Screen Quality)</option>
                         <option value="96">96 DPI (Web Quality)</option>
                     </select>
-                    <div class="value-display">🔍 Higher DPI = Larger file, Better quality</div>
                 </div>
                 
                 <div class="control-group">
-                    <label>💧 Watermark Text</label>
+                    <label>🔴 Watermark Text</label>
                     <input type="text" id="watermarkText" value="ourbook 911573334">
-                    <div class="value-display">Leave empty for no watermark</div>
+                    <div class="watermark-preview" id="watermarkPreview">
+                        🔴 Preview: <span style="color: #dc3545; font-size: 10px;">ourbook 911573334</span>
+                    </div>
                 </div>
                 
                 <div class="control-group">
@@ -375,7 +364,6 @@
                         <option value="rgb">RGB (Standard)</option>
                         <option value="cmyk">CMYK (Print Ready)</option>
                     </select>
-                    <div class="value-display">🎨 CMYK for professional printing</div>
                 </div>
             </div>
         </div>
@@ -416,7 +404,12 @@
         const watermarkPositionSelect = document.getElementById('watermarkPosition');
         const colorProfileSelect = document.getElementById('colorProfile');
         
-        // Quality mapping
+        // Update watermark preview
+        watermarkTextInput.addEventListener('input', () => {
+            const preview = document.getElementById('watermarkPreview');
+            preview.innerHTML = `🔴 Preview: <span style="color: #dc3545; font-size: 10px;">${watermarkTextInput.value || 'ourbook 911573334'}</span>`;
+        });
+        
         const qualityMap = {
             maximum: 1.0,
             high: 0.95,
@@ -424,7 +417,6 @@
             standard: 0.8
         };
         
-        // Page sizes in points (1pt = 1/72 inch)
         const pageSizes = {
             a4: { width: 595, height: 842, name: 'a4' },
             a3: { width: 842, height: 1191, name: 'a3' },
@@ -531,7 +523,7 @@
             const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
             const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
             const qualityMode = qualityModeSelect.options[qualityModeSelect.selectedIndex].text;
-            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 ${sizeMB} MB | 🎨 ${qualityMode} | 📐 ${dpiSettingSelect.value} DPI`;
+            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 ${sizeMB} MB | 🎨 ${qualityMode} | 📐 ${dpiSettingSelect.value} DPI | 🔴 Red Watermark`;
         }
         
         function showStatus(message, type) {
@@ -563,14 +555,12 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         
-                        // Calculate dimensions for target DPI
-                        const currentDPI = 96; // Screen DPI
+                        const currentDPI = 96;
                         const scale = targetDPI / currentDPI;
                         
                         let width = img.width;
                         let height = img.height;
                         
-                        // Only scale if target DPI is higher (for quality)
                         if (targetDPI > currentDPI) {
                             width = img.width * scale;
                             height = img.height * scale;
@@ -580,13 +570,11 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         
-                        // Enable image smoothing for better quality
                         ctx.imageSmoothingEnabled = true;
                         ctx.imageSmoothingQuality = 'high';
                         
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Get quality setting
                         let outputQuality = quality;
                         let format = 'image/jpeg';
                         
@@ -613,33 +601,42 @@
             });
         }
         
+        // UPDATED: Small Red Watermark Function
         function addWatermark(pdf, pageWidth, pageHeight, text, position) {
             if (!text || text.trim() === '' || position === 'none') return;
             
-            const fontSize = Math.max(8, Math.min(24, pageWidth / 20));
+            // SMALL FONT SIZE (6-10 points instead of 15-25)
+            const fontSize = Math.max(6, Math.min(10, pageWidth / 50));
             pdf.setFontSize(fontSize);
-            pdf.setTextColor(150, 150, 150);
-            pdf.setGState(new pdf.GState({ opacity: 0.25 }));
+            
+            // RED COLOR (RGB: 255, 0, 0)
+            pdf.setTextColor(255, 0, 0);
+            
+            // Semi-transparent (30% opacity for subtle look)
+            pdf.setGState(new pdf.GState({ opacity: 0.35 }));
             
             let x, y;
             const textWidth = pdf.getTextWidth(text);
             
+            // Add small padding
+            const padding = 8;
+            
             switch(position) {
                 case 'bottom-right':
-                    x = pageWidth - textWidth - 15;
-                    y = pageHeight - 20;
+                    x = pageWidth - textWidth - padding;
+                    y = pageHeight - padding;
                     break;
                 case 'bottom-left':
-                    x = 15;
-                    y = pageHeight - 20;
+                    x = padding;
+                    y = pageHeight - padding;
                     break;
                 case 'top-right':
-                    x = pageWidth - textWidth - 15;
-                    y = 20;
+                    x = pageWidth - textWidth - padding;
+                    y = padding + 5;
                     break;
                 case 'top-left':
-                    x = 15;
-                    y = 20;
+                    x = padding;
+                    y = padding + 5;
                     break;
                 case 'center':
                     x = (pageWidth - textWidth) / 2;
@@ -659,7 +656,7 @@
             }
             
             convertBtn.disabled = true;
-            showStatus('🔄 Creating professional quality PDF...', 'info');
+            showStatus('🔄 Creating professional quality PDF with RED watermark...', 'info');
             
             try {
                 const { jsPDF } = jspdf;
@@ -677,13 +674,11 @@
                     const progressPercent = Math.round((i / selectedFiles.length) * 100);
                     updateProgress(progressPercent, `Processing ${i+1}/${selectedFiles.length} at ${targetDPI} DPI`);
                     
-                    // Load and process image with DPI scaling
                     const processed = await loadImageWithDPI(file, quality, targetDPI);
                     
                     let pdfWidth, pdfHeight, imgWidth, imgHeight, x, y;
                     
                     if (pageSizeValue === 'image') {
-                        // Convert pixels to points based on DPI
                         const pxToPoints = 72 / targetDPI;
                         pdfWidth = processed.width * pxToPoints;
                         pdfHeight = processed.height * pxToPoints;
@@ -696,7 +691,7 @@
                             pdf = new jsPDF({
                                 unit: 'pt',
                                 format: [pdfWidth, pdfHeight],
-                                compress: false, // No compression for max quality
+                                compress: false,
                                 hotfixes: ['px_scaling']
                             });
                             isFirstPage = false;
@@ -736,25 +731,24 @@
                         }
                     }
                     
-                    // Add image with highest quality settings
                     const format = file.type === 'image/png' ? 'PNG' : 'JPEG';
                     pdf.addImage(processed.base64, format, x, y, imgWidth, imgHeight, null, 'NONE');
                     
-                    // Add watermark
+                    // Add SMALL RED WATERMARK
                     addWatermark(pdf, pdfWidth, pdfHeight, watermarkText, watermarkPos);
                 }
                 
                 updateProgress(100, 'Complete!');
                 
                 const timestamp = new Date().getTime();
-                const filename = `professional-pdf-${timestamp}.pdf`;
+                const filename = `ourbook-red-watermark-${timestamp}.pdf`;
                 pdf.save(filename);
                 
                 const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
                 const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
                 const qualityLabel = qualityModeSelect.options[qualityModeSelect.selectedIndex].text;
                 
-                showStatus(`✅ Professional PDF Created! ${selectedFiles.length} images | ${sizeMB}MB original | Quality: ${qualityLabel} | DPI: ${targetDPI} | Watermark: ${watermarkText || 'None'}`, 'success');
+                showStatus(`✅ PDF Created! ${selectedFiles.length} images | ${sizeMB}MB | ${qualityLabel} | ${targetDPI} DPI | 🔴 Small RED Watermark: "${watermarkText}"`, 'success');
                 
             } catch (error) {
                 console.error('Error:', error);

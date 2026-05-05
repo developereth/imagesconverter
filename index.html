@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to PDF Converter - With Compression & Watermark</title>
+    <title>Professional Image to PDF Converter - High Quality</title>
     <style>
         * {
             margin: 0;
@@ -13,13 +13,13 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -41,7 +41,7 @@
         }
 
         .upload-area {
-            border: 2px dashed #667eea;
+            border: 2px dashed #2a5298;
             border-radius: 10px;
             padding: 40px;
             text-align: center;
@@ -52,88 +52,89 @@
 
         .upload-area:hover {
             background: #f0f0ff;
-            border-color: #764ba2;
+            border-color: #1e3c72;
         }
 
         .upload-area.drag-over {
             background: #e8e8ff;
-            border-color: #764ba2;
+            border-color: #2a5298;
         }
 
         #fileInput {
             display: none;
         }
 
-        .mode-selector {
+        /* Advanced Controls */
+        .advanced-panel {
             margin: 20px 0;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .mode-btn {
-            padding: 10px 20px;
-            margin: 0 5px;
-            border: 2px solid #667eea;
-            background: white;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-
-        .mode-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .settings-panel {
-            margin: 20px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 20px;
-            background: #f9f9f9;
-            border-radius: 10px;
-            display: flex;
+            border-radius: 15px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #1e3c72;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            flex-wrap: wrap;
-            justify-content: space-between;
         }
 
-        .setting-item {
-            flex: 1;
-            min-width: 200px;
+        .control-group {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .setting-item label {
+        .control-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
             color: #333;
         }
 
-        .setting-item input, .setting-item select {
+        .control-group input, .control-group select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
 
-        .watermark-preview {
-            margin-top: 10px;
+        .value-display {
+            margin-top: 5px;
             font-size: 12px;
             color: #666;
-            font-style: italic;
         }
 
-        .quality-value {
+        .quality-badge {
             display: inline-block;
-            margin-left: 10px;
-            color: #667eea;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: bold;
+            margin-left: 10px;
         }
 
+        .quality-excellent {
+            background: #28a745;
+            color: white;
+        }
+
+        .quality-good {
+            background: #ffc107;
+            color: #333;
+        }
+
+        /* Preview Area */
         .preview-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 15px;
             margin: 20px 0;
             max-height: 500px;
@@ -150,6 +151,7 @@
             overflow: hidden;
             background: white;
             transition: transform 0.2s;
+            cursor: pointer;
         }
 
         .preview-item:hover {
@@ -196,11 +198,11 @@
 
         button {
             flex: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             border: none;
             padding: 15px 20px;
-            font-size: 18px;
+            font-size: 16px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
@@ -218,7 +220,7 @@
         }
 
         .clear-btn {
-            background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
         }
 
         .status {
@@ -234,18 +236,21 @@
         }
 
         .status.success {
-            background: #c6f6d5;
-            color: #22543d;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
 
         .status.error {
-            background: #fed7d7;
-            color: #742a2a;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
 
         .status.info {
-            background: #bee3f8;
-            color: #2c5282;
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
 
         .file-info {
@@ -282,13 +287,6 @@
             font-weight: bold;
         }
 
-        .size-comparison {
-            margin-top: 10px;
-            font-size: 12px;
-            text-align: center;
-            color: #666;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -298,53 +296,87 @@
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
             
-            .preview-img {
-                height: 100px;
-            }
-            
-            .settings-panel {
-                flex-direction: column;
+            .controls-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🖼️ Image to PDF Converter</h1>
-        <div class="subtitle">✅ Compression + Watermark | Smaller PDF Files</div>
+        <h1>🖼️ Professional Image to PDF Converter</h1>
+        <div class="subtitle">⚡ Maximum Quality | Advanced Controls | Professional Output</div>
         
         <div class="upload-area" id="uploadArea">
             <p>📁 Click or Drag & Drop Images Here</p>
-            <small>Compressed PDF = Smaller file size | Watermark included</small>
+            <small>Professional quality • High resolution • Advanced settings</small>
         </div>
         
         <input type="file" id="fileInput" multiple accept="image/*">
         
-        <div class="mode-selector">
-            <strong>📄 PDF Page Size:</strong><br><br>
-            <button class="mode-btn active" data-mode="image">🎯 MATCH IMAGE SIZE</button>
-            <button class="mode-btn" data-mode="a4">📄 A4 Paper</button>
-            <button class="mode-btn" data-mode="letter">📄 Letter Paper</button>
-        </div>
-
-        <div class="settings-panel">
-            <div class="setting-item">
-                <label>📦 Compression Quality:</label>
-                <input type="range" id="compression" min="0.3" max="1" step="0.01" value="0.7">
-                <span class="quality-value" id="qualityValue">70%</span>
-                <div class="size-comparison">Lower = Smaller file | Higher = Better quality</div>
-            </div>
-            
-            <div class="setting-item">
-                <label>💧 Watermark Settings:</label>
-                <select id="watermarkPosition">
-                    <option value="bottom-right">Bottom Right</option>
-                    <option value="bottom-left">Bottom Left</option>
-                    <option value="top-right">Top Right</option>
-                    <option value="top-left">Top Left</option>
-                    <option value="center">Center</option>
-                </select>
-                <div class="watermark-preview">🔖 Watermark: <strong>ourbook 911573334</strong></div>
+        <!-- Advanced Settings Panel -->
+        <div class="advanced-panel">
+            <div class="panel-title">⚙️ ADVANCED QUALITY CONTROLS</div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label>📄 Page Size</label>
+                    <select id="pageSize">
+                        <option value="image">Match Image Size (Best Quality)</option>
+                        <option value="a4">A4 (210 x 297mm)</option>
+                        <option value="a3">A3 (297 x 420mm)</option>
+                        <option value="letter">Letter (8.5 x 11in)</option>
+                        <option value="legal">Legal (8.5 x 14in)</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>🎨 Quality Setting</label>
+                    <select id="qualityMode">
+                        <option value="maximum">Maximum (100% - Best Quality)</option>
+                        <option value="high">High (95% - Excellent)</option>
+                        <option value="professional">Professional (90% - Recommended)</option>
+                        <option value="standard">Standard (80% - Good)</option>
+                    </select>
+                    <div class="value-display">💡 Maximum quality for printing/archiving</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>📐 DPI Setting</label>
+                    <select id="dpiSetting">
+                        <option value="300">300 DPI (Print Quality)</option>
+                        <option value="200">200 DPI (Good Quality)</option>
+                        <option value="150">150 DPI (Screen Quality)</option>
+                        <option value="96">96 DPI (Web Quality)</option>
+                    </select>
+                    <div class="value-display">🔍 Higher DPI = Larger file, Better quality</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>💧 Watermark Text</label>
+                    <input type="text" id="watermarkText" value="ourbook 911573334">
+                    <div class="value-display">Leave empty for no watermark</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>🔖 Watermark Position</label>
+                    <select id="watermarkPosition">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                        <option value="center">Center</option>
+                        <option value="none">No Watermark</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>🎯 Color Profile</label>
+                    <select id="colorProfile">
+                        <option value="rgb">RGB (Standard)</option>
+                        <option value="cmyk">CMYK (Print Ready)</option>
+                    </select>
+                    <div class="value-display">🎨 CMYK for professional printing</div>
+                </div>
             </div>
         </div>
         
@@ -352,7 +384,7 @@
         
         <div class="button-group">
             <button class="clear-btn" id="clearBtn">Clear All 🗑️</button>
-            <button id="convertBtn">Convert to PDF 📄</button>
+            <button id="convertBtn">✨ Convert to Professional PDF</button>
         </div>
         
         <div class="progress-bar" id="progressBar">
@@ -366,7 +398,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         let selectedFiles = [];
-        let currentMode = 'image';
         
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
@@ -377,25 +408,29 @@
         const fileInfo = document.getElementById('fileInfo');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
-        const compressionSlider = document.getElementById('compression');
-        const qualityValue = document.getElementById('qualityValue');
-        const watermarkPosition = document.getElementById('watermarkPosition');
         
-        // Compression quality display
-        compressionSlider.addEventListener('input', () => {
-            const value = Math.round(compressionSlider.value * 100);
-            qualityValue.textContent = `${value}%`;
-        });
+        const pageSizeSelect = document.getElementById('pageSize');
+        const qualityModeSelect = document.getElementById('qualityMode');
+        const dpiSettingSelect = document.getElementById('dpiSetting');
+        const watermarkTextInput = document.getElementById('watermarkText');
+        const watermarkPositionSelect = document.getElementById('watermarkPosition');
+        const colorProfileSelect = document.getElementById('colorProfile');
         
-        // Mode selection
-        document.querySelectorAll('.mode-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentMode = btn.dataset.mode;
-                showStatus(`Mode: ${btn.textContent}`, 'info');
-            });
-        });
+        // Quality mapping
+        const qualityMap = {
+            maximum: 1.0,
+            high: 0.95,
+            professional: 0.9,
+            standard: 0.8
+        };
+        
+        // Page sizes in points (1pt = 1/72 inch)
+        const pageSizes = {
+            a4: { width: 595, height: 842, name: 'a4' },
+            a3: { width: 842, height: 1191, name: 'a3' },
+            letter: { width: 612, height: 792, name: 'letter' },
+            legal: { width: 612, height: 1008, name: 'legal' }
+        };
         
         uploadArea.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => handleFiles(Array.from(e.target.files)));
@@ -456,7 +491,7 @@
         
         function updatePreview() {
             if (selectedFiles.length === 0) {
-                previewGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No images selected. Upload your images here!</div>';
+                previewGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No images selected. Upload your high-quality images here!</div>';
                 return;
             }
             
@@ -495,7 +530,8 @@
             
             const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
             const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
-            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 Original: ${sizeMB} MB | Mode: ${currentMode.toUpperCase()}`;
+            const qualityMode = qualityModeSelect.options[qualityModeSelect.selectedIndex].text;
+            fileInfo.textContent = `📊 ${selectedFiles.length} image(s) | 💾 ${sizeMB} MB | 🎨 ${qualityMode} | 📐 ${dpiSettingSelect.value} DPI`;
         }
         
         function showStatus(message, type) {
@@ -503,7 +539,7 @@
             statusDiv.className = `status ${type} show`;
             setTimeout(() => {
                 statusDiv.classList.remove('show');
-            }, 3000);
+            }, 4000);
         }
         
         function updateProgress(percent, text) {
@@ -519,69 +555,90 @@
             }
         }
         
-        function fileToBase64(file, quality) {
+        async function loadImageWithDPI(file, quality, targetDPI) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    if (file.type === 'image/jpeg' && quality < 1) {
-                        // Compress JPEG images
-                        const img = new Image();
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0);
-                            canvas.toBlob((blob) => {
-                                const compressedReader = new FileReader();
-                                compressedReader.onloadend = () => resolve(compressedReader.result);
-                                compressedReader.readAsDataURL(blob);
-                            }, 'image/jpeg', quality);
-                        };
-                        img.src = e.target.result;
-                    } else {
-                        resolve(e.target.result);
-                    }
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        
+                        // Calculate dimensions for target DPI
+                        const currentDPI = 96; // Screen DPI
+                        const scale = targetDPI / currentDPI;
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        // Only scale if target DPI is higher (for quality)
+                        if (targetDPI > currentDPI) {
+                            width = img.width * scale;
+                            height = img.height * scale;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        
+                        // Enable image smoothing for better quality
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Get quality setting
+                        let outputQuality = quality;
+                        let format = 'image/jpeg';
+                        
+                        if (file.type === 'image/png' && quality >= 0.95) {
+                            format = 'image/png';
+                            outputQuality = undefined;
+                        }
+                        
+                        canvas.toBlob((blob) => {
+                            const finalReader = new FileReader();
+                            finalReader.onloadend = () => resolve({
+                                base64: finalReader.result,
+                                width: width,
+                                height: height
+                            });
+                            finalReader.readAsDataURL(blob);
+                        }, format, outputQuality);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
         }
         
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
-        }
-        
-        function addWatermark(pdf, pageWidth, pageHeight, position) {
-            const watermarkText = 'ourbook 911573334';
-            const fontSize = pageWidth / 15; // Responsive font size
+        function addWatermark(pdf, pageWidth, pageHeight, text, position) {
+            if (!text || text.trim() === '' || position === 'none') return;
+            
+            const fontSize = Math.max(8, Math.min(24, pageWidth / 20));
             pdf.setFontSize(fontSize);
-            pdf.setTextColor(150, 150, 150); // Light gray
-            pdf.setGState(new pdf.GState({ opacity: 0.3 })); // 30% transparent
+            pdf.setTextColor(150, 150, 150);
+            pdf.setGState(new pdf.GState({ opacity: 0.25 }));
             
             let x, y;
-            const textWidth = pdf.getTextWidth(watermarkText);
+            const textWidth = pdf.getTextWidth(text);
             
             switch(position) {
                 case 'bottom-right':
-                    x = pageWidth - textWidth - 10;
-                    y = pageHeight - 15;
+                    x = pageWidth - textWidth - 15;
+                    y = pageHeight - 20;
                     break;
                 case 'bottom-left':
-                    x = 10;
-                    y = pageHeight - 15;
+                    x = 15;
+                    y = pageHeight - 20;
                     break;
                 case 'top-right':
-                    x = pageWidth - textWidth - 10;
+                    x = pageWidth - textWidth - 15;
                     y = 20;
                     break;
                 case 'top-left':
-                    x = 10;
+                    x = 15;
                     y = 20;
                     break;
                 case 'center':
@@ -589,11 +646,10 @@
                     y = pageHeight / 2;
                     break;
                 default:
-                    x = pageWidth - textWidth - 10;
-                    y = pageHeight - 15;
+                    return;
             }
             
-            pdf.text(watermarkText, x, y);
+            pdf.text(text, x, y);
         }
         
         async function convertToPDF() {
@@ -603,39 +659,34 @@
             }
             
             convertBtn.disabled = true;
-            showStatus('🔄 Converting with compression and watermark...', 'info');
+            showStatus('🔄 Creating professional quality PDF...', 'info');
             
             try {
                 const { jsPDF } = jspdf;
                 let pdf = null;
                 let isFirstPage = true;
-                const compressionQuality = parseFloat(compressionSlider.value);
-                const watermarkPos = watermarkPosition.value;
                 
-                let originalSize = 0;
-                let compressedSize = 0;
+                const quality = qualityMap[qualityModeSelect.value];
+                const targetDPI = parseInt(dpiSettingSelect.value);
+                const pageSizeValue = pageSizeSelect.value;
+                const watermarkText = watermarkTextInput.value;
+                const watermarkPos = watermarkPositionSelect.value;
                 
                 for (let i = 0; i < selectedFiles.length; i++) {
                     const file = selectedFiles[i];
-                    originalSize += file.size;
-                    
                     const progressPercent = Math.round((i / selectedFiles.length) * 100);
-                    updateProgress(progressPercent, `Processing ${i+1}/${selectedFiles.length}`);
+                    updateProgress(progressPercent, `Processing ${i+1}/${selectedFiles.length} at ${targetDPI} DPI`);
                     
-                    // Compress if quality is less than 100%
-                    const base64 = await fileToBase64(file, compressionQuality);
-                    const img = await loadImage(base64);
-                    
-                    // Calculate compressed size
-                    const base64Size = Math.round((base64.length * 3) / 4);
-                    compressedSize += base64Size;
+                    // Load and process image with DPI scaling
+                    const processed = await loadImageWithDPI(file, quality, targetDPI);
                     
                     let pdfWidth, pdfHeight, imgWidth, imgHeight, x, y;
                     
-                    if (currentMode === 'image') {
-                        const pxToPoints = 72 / 96;
-                        pdfWidth = img.width * pxToPoints;
-                        pdfHeight = img.height * pxToPoints;
+                    if (pageSizeValue === 'image') {
+                        // Convert pixels to points based on DPI
+                        const pxToPoints = 72 / targetDPI;
+                        pdfWidth = processed.width * pxToPoints;
+                        pdfHeight = processed.height * pxToPoints;
                         imgWidth = pdfWidth;
                         imgHeight = pdfHeight;
                         x = 0;
@@ -645,17 +696,19 @@
                             pdf = new jsPDF({
                                 unit: 'pt',
                                 format: [pdfWidth, pdfHeight],
-                                compress: true
+                                compress: false, // No compression for max quality
+                                hotfixes: ['px_scaling']
                             });
                             isFirstPage = false;
                         } else {
                             pdf.addPage([pdfWidth, pdfHeight], 'pt');
                         }
+                    } else {
+                        const size = pageSizes[pageSizeValue];
+                        pdfWidth = size.width;
+                        pdfHeight = size.height;
                         
-                    } else if (currentMode === 'a4') {
-                        pdfWidth = 595;
-                        pdfHeight = 842;
-                        const imgAspect = img.width / img.height;
+                        const imgAspect = processed.width / processed.height;
                         const pageAspect = pdfWidth / pdfHeight;
                         
                         if (imgAspect > pageAspect) {
@@ -673,62 +726,35 @@
                         if (isFirstPage) {
                             pdf = new jsPDF({
                                 unit: 'pt',
-                                format: 'a4',
-                                compress: true
+                                format: size.name,
+                                compress: false,
+                                hotfixes: ['px_scaling']
                             });
                             isFirstPage = false;
                         } else {
-                            pdf.addPage('a4', 'pt');
-                        }
-                        
-                    } else if (currentMode === 'letter') {
-                        pdfWidth = 612;
-                        pdfHeight = 792;
-                        const imgAspect = img.width / img.height;
-                        const pageAspect = pdfWidth / pdfHeight;
-                        
-                        if (imgAspect > pageAspect) {
-                            imgWidth = pdfWidth;
-                            imgHeight = pdfWidth / imgAspect;
-                            x = 0;
-                            y = (pdfHeight - imgHeight) / 2;
-                        } else {
-                            imgHeight = pdfHeight;
-                            imgWidth = pdfHeight * imgAspect;
-                            x = (pdfWidth - imgWidth) / 2;
-                            y = 0;
-                        }
-                        
-                        if (isFirstPage) {
-                            pdf = new jsPDF({
-                                unit: 'pt',
-                                format: 'letter',
-                                compress: true
-                            });
-                            isFirstPage = false;
-                        } else {
-                            pdf.addPage('letter', 'pt');
+                            pdf.addPage(size.name, 'pt');
                         }
                     }
                     
+                    // Add image with highest quality settings
                     const format = file.type === 'image/png' ? 'PNG' : 'JPEG';
-                    pdf.addImage(base64, format, x, y, imgWidth, imgHeight, undefined, 'FAST');
+                    pdf.addImage(processed.base64, format, x, y, imgWidth, imgHeight, null, 'NONE');
                     
                     // Add watermark
-                    addWatermark(pdf, pdfWidth, pdfHeight, watermarkPos);
+                    addWatermark(pdf, pdfWidth, pdfHeight, watermarkText, watermarkPos);
                 }
                 
                 updateProgress(100, 'Complete!');
                 
                 const timestamp = new Date().getTime();
-                const filename = `ourbook-pdf-${timestamp}.pdf`;
+                const filename = `professional-pdf-${timestamp}.pdf`;
                 pdf.save(filename);
                 
-                const originalMB = (originalSize / (1024 * 1024)).toFixed(2);
-                const compressedMB = (compressedSize / (1024 * 1024)).toFixed(2);
-                const savedPercent = ((1 - compressedSize/originalSize) * 100).toFixed(0);
+                const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+                const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+                const qualityLabel = qualityModeSelect.options[qualityModeSelect.selectedIndex].text;
                 
-                showStatus(`✅ Success! ${selectedFiles.length} images → PDF | Original: ${originalMB}MB | Compressed: ${compressedMB}MB | Saved: ${savedPercent}% | Watermark: ourbook 911573334`, 'success');
+                showStatus(`✅ Professional PDF Created! ${selectedFiles.length} images | ${sizeMB}MB original | Quality: ${qualityLabel} | DPI: ${targetDPI} | Watermark: ${watermarkText || 'None'}`, 'success');
                 
             } catch (error) {
                 console.error('Error:', error);

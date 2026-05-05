@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to PDF Converter - Free Tool</title>
+    <title>Image to PDF Converter - No Cropping, Perfect Fit</title>
     <style>
         * {
             margin: 0;
@@ -69,18 +69,20 @@
             margin: 20px 0;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .settings {
             display: flex;
             gap: 15px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .settings label {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
             font-size: 14px;
         }
 
@@ -88,6 +90,7 @@
             padding: 5px 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
+            cursor: pointer;
         }
 
         .preview-grid {
@@ -119,14 +122,16 @@
         .preview-img {
             width: 100%;
             height: 150px;
-            object-fit: cover;
+            object-fit: contain;
+            background: #f0f0f0;
         }
 
         .preview-info {
             padding: 5px;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
             background: #f0f0f0;
+            word-break: break-all;
         }
 
         .remove-btn {
@@ -272,7 +277,7 @@
 <body>
     <div class="container">
         <h1>🖼️ Image to PDF Converter</h1>
-        <div class="subtitle">Free • Private • Works in Your Browser</div>
+        <div class="subtitle">No Cropping • Perfect Fit • 100% Private</div>
         
         <div class="upload-area" id="uploadArea">
             <p>📁 Click or Drag & Drop Images Here</p>
@@ -294,9 +299,9 @@
                 <label>
                     🎨 Image Fit:
                     <select id="imageFit">
-                        <option value="fit">Fit to Page</option>
+                        <option value="fit">Fit to Page (No Cropping)</option>
                         <option value="original">Original Size</option>
-                        <option value="stretch">Stretch to Fill</option>
+                        <option value="contain">Contain with Background</option>
                     </select>
                 </label>
             </div>
@@ -422,7 +427,8 @@
                 
                 const info = document.createElement('div');
                 info.className = 'preview-info';
-                info.textContent = `${file.name.substring(0, 20)}${file.name.length > 20 ? '...' : ''}`;
+                const sizeKB = (file.size / 1024).toFixed(1);
+                info.textContent = `${file.name.substring(0, 15)}${file.name.length > 15 ? '...' : ''} (${sizeKB}KB)`;
                 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'remove-btn';
@@ -499,7 +505,7 @@
             }
             
             convertBtn.disabled = true;
-            showStatus('🔄 Converting images to PDF...', 'info');
+            showStatus('🔄 Converting images to PDF. Please wait...', 'info');
             
             try {
                 const { jsPDF } = jspdf;
@@ -522,9 +528,8 @@
                     // Load image to get dimensions
                     const img = await loadImage(base64);
                     
-                    // Calculate dimensions
-                    let imgWidth = pageSize.width;
-                    let imgHeight = pageSize.height;
+                    // Calculate dimensions to fit WITHOUT cropping
+                    let imgWidth, imgHeight, x, y;
                     
                     if (imageFit === 'original') {
                         // Convert pixels to mm (assuming 96 DPI)
@@ -543,25 +548,47 @@
                             imgHeight = pageSize.height;
                             imgWidth = imgWidth * ratio;
                         }
-                    } else if (imageFit === 'stretch') {
-                        imgWidth = pageSize.width;
-                        imgHeight = pageSize.height;
-                    } else {
-                        // Fit to page (maintain aspect ratio)
-                        const ratio = Math.min(pageSize.width / imgWidth, pageSize.height / imgHeight);
+                        
+                        // Center the image
+                        x = (pageSize.width - imgWidth) / 2;
+                        y = (pageSize.height - imgHeight) / 2;
+                        
+                    } else if (imageFit === 'contain') {
+                        // Contain with background (maintain aspect ratio, add white background)
+                        const ratio = Math.min(pageSize.width / img.width, pageSize.height / img.height);
                         imgWidth = img.width * ratio;
                         imgHeight = img.height * ratio;
+                        
+                        // Center the image
+                        x = (pageSize.width - imgWidth) / 2;
+                        y = (pageSize.height - imgHeight) / 2;
+                        
+                    } else {
+                        // FIT TO PAGE - Maintain aspect ratio, no cropping
+                        const imgAspect = img.width / img.height;
+                        const pageAspect = pageSize.width / pageSize.height;
+                        
+                        if (imgAspect > pageAspect) {
+                            // Image is wider - fit to width
+                            imgWidth = pageSize.width;
+                            imgHeight = imgWidth / imgAspect;
+                            x = 0;
+                            y = (pageSize.height - imgHeight) / 2;
+                        } else {
+                            // Image is taller - fit to height
+                            imgHeight = pageSize.height;
+                            imgWidth = imgHeight * imgAspect;
+                            x = (pageSize.width - imgWidth) / 2;
+                            y = 0;
+                        }
                     }
-                    
-                    // Center the image
-                    const x = (pageSize.width - imgWidth) / 2;
-                    const y = (pageSize.height - imgHeight) / 2;
                     
                     // Create new page
                     if (isFirstPage) {
                         pdf = new jsPDF({
                             unit: 'mm',
-                            format: pageSizeSelect.value
+                            format: pageSizeSelect.value,
+                            compress: true
                         });
                         isFirstPage = false;
                     } else {
@@ -569,23 +596,31 @@
                     }
                     
                     // Add image to PDF
+                    if (imageFit === 'contain') {
+                        // Add white background first
+                        pdf.setFillColor(255, 255, 255);
+                        pdf.rect(0, 0, pageSize.width, pageSize.height, 'F');
+                    }
+                    
+                    // Add the image
                     pdf.addImage(base64, 'JPEG', x, y, imgWidth, imgHeight, undefined, 'FAST');
                 }
                 
                 updateProgress(100, 'Complete!');
                 
-                // Generate filename
-                const timestamp = new Date().getTime();
+                // Generate filename with date
+                const now = new Date();
+                const timestamp = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
                 const filename = `images-to-pdf-${timestamp}.pdf`;
                 
                 // Save the PDF
                 pdf.save(filename);
                 
-                showStatus(`✅ Success! Converted ${selectedFiles.length} image(s) to PDF. File downloaded as "${filename}"`, 'success');
+                showStatus(`✅ Success! Converted ${selectedFiles.length} image(s) to PDF. File: ${filename}`, 'success');
                 
             } catch (error) {
                 console.error('Conversion error:', error);
-                showStatus(`❌ Error: ${error.message}. Please try again with fewer or smaller images.`, 'error');
+                showStatus(`❌ Error: ${error.message}. Try with fewer or smaller images.`, 'error');
             } finally {
                 convertBtn.disabled = false;
                 setTimeout(() => {
@@ -605,7 +640,7 @@
         });
         
         // Initial message
-        console.log('Image to PDF Converter ready!');
+        console.log('Image to PDF Converter ready - No cropping guaranteed!');
     </script>
 </body>
 </html>
